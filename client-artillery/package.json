@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "artillery": "^2.0.19",
+    "ws": "^8.18.0"
+  }
+}

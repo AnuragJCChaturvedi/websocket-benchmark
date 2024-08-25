@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> WS Client </title>
+    </head>
+<body>
+    <h1>WebSocket Client</h1>
+    <button id="connectButton">Connect</button>
+    <button id="disconnectButton" disabled>Disconnect</button>
+    <br>
+    <input type="text" id="messageInput" placeholder="Enter message">
+    <button id="sendButton" disabled>Send</button>
+    <pre id="output"></pre>
+
+    <script>
+        let ws;
+
+        document.getElementById('connectButton').addEventListener('click', () => {
+            ws = new WebSocket('ws://localhost:3001');  // Set the correct endpoint
+
+            ws.onopen = () => {
+                document.getElementById('disconnectButton').disabled = false;
+                document.getElementById('sendButton').disabled = false;
+                log('Connected to WebSocket server');
+            };
+
+            ws.onmessage = (event) => {
+                log('Received: ' + event.data);
+            };
+
+            ws.onclose = () => {
+                document.getElementById('disconnectButton').disabled = true;
+                document.getElementById('sendButton').disabled = true;
+                log('Disconnected from WebSocket server');
+            };
+
+            ws.onerror = (event) => {
+                log('WebSocket error: ' + event);
+            };
+        });
+
+        document.getElementById('disconnectButton').addEventListener('click', () => {
+            if (ws) {
+                ws.close();
+            }
+        });
+
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = document.getElementById('messageInput').value;
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(message);
+                log('Sent: ' + message);
+            }
+        });
+
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += message + '\n';
+        }
+
+    </script>
+</body>
+
+</html>

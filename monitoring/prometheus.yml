@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'nodejs_websocket_server'
+    static_configs:
+      - targets: ['nodejs-server:3001']
+        labels:
+          language: 'nodejs'
+
+  - job_name: 'go_websocket_server'
+    static_configs:
+      - targets: ['go-server:3002']
+        labels:
+          language: 'golang'

@@ -1,0 +1,16 @@
+config:
+  target: "ws://localhost:3001"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+      # rampTo: 20
+  ws:
+    binaryType: "arraybuffer"
+  processor: "./process.js"
+scenarios:
+  - name: My load test
+    engine: "ws"
+    flow:
+      - function: "sendMessage"
+      - send: 
+          data: {{ message }}

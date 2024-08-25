@@ -1,0 +1,77 @@
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - prometheus-data:/prometheus
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    restart: unless-stopped
+
+  nodejs:
+    build:
+      context: ./websocket-server/nodejs
+      dockerfile: Dockerfile
+    container_name: nodejs-server
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    env_file:
+      - shared.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.8"
+          memory: "1200M"
+
+  go:
+    build:
+      context: ./websocket-server/go
+      dockerfile: Dockerfile
+    container_name: go-server
+    ports:
+      - "3002:3002"
+    restart: unless-stopped
+    env_file:
+      - shared.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.8"
+          memory: "1200M"
+
+  k6:
+    build:
+      context: ./client-k6
+      dockerfile: Dockerfile
+    container_name: k6
+    restart: no
+    env_file:
+      - shared.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.8"
+          memory: "2400M"
+    depends_on:
+      - nodejs
+      - go
+
+
+volumes:
+  grafana-storage:
+  prometheus-data:
