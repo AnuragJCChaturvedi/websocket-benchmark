@@ -50,20 +50,27 @@ func init() {
 		histogramServerResponseTime, counterConnectionErrors, counterMessageErrors)
 }
 
-// WebSocket upgrader
+// WebSocket upgrader with larger buffer sizes
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  4096,
-	WriteBufferSize: 4096,
+	ReadBufferSize:  8192,
+	WriteBufferSize: 8192,
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
 func websocketHandler(w http.ResponseWriter, r *http.Request) {
+	// Upgrade the connection to WebSocket first
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Failed to upgrade to WebSocket:", err)
 		counterConnectionErrors.Inc()
 		return
 	}
+
+	// Now that the connection is upgraded, handle it in a separate goroutine
+	go websocketHandlerRoutine(conn)
+}
+
+func websocketHandlerRoutine(conn *websocket.Conn) {
 	defer conn.Close()
 
 	log.Println("New WebSocket connection established")
@@ -94,8 +101,6 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(receivedMessage.GetReceiverId())
 			log.Println(receivedMessage.GetSenderId())
 
-			// log.Printf("Received message: %s", receivedMessage.String())
-
 			// Echo the message back to the client
 			if err := conn.WriteMessage(websocket.BinaryMessage, msg); err != nil {
 				log.Println("Error writing message:", err)
@@ -124,5 +129,9 @@ func main() {
 	r.Handle("/metrics", promhttp.Handler())
 
 	// Start the server
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("GO_SERVER_PORT"), r))
+	port := os.Getenv("GO_SERVER_PORT")
+	if port == "" {
+		port = "8080" // Default port if not set
+	}
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
