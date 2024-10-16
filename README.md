@@ -28,7 +28,7 @@ This setup includes WebSocket servers built with **Node.js** and **Go**, using *
 
 ```bash
 git clone https://github.com/AnuragJCChaturvedi/websocket-benchmark
-cd your-repo
+cd websocket-benchmark
 ```
 
 ### 2. Configuration Files
