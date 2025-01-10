@@ -109,10 +109,6 @@ The Docker Compose file includes resource limits (CPU and memory) for the Node.j
 2. Log in with the default credentials (`admin:secret`).
 3. Create a new dashboard or import existing ones to visualize WebSocket performance metrics.
 
-## License
-
-This project is licensed under the MIT License.
-
 ## Protocol Buffers (Protobuf)
 
 This project uses **Protocol Buffers** (Protobuf) for efficient serialization of structured data in WebSocket communication. Protobuf is a language-neutral, platform-neutral, and extensible way to serialize structured data.
